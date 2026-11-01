@@ -1,0 +1,925 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body><title>論文審閱稿</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* 版面：左側章節目錄＋中間一疊 A4 論文頁；紙面固定白底黑字（照北科模板），外框跟隨主題 */
+:root {
+  --desk: #e6e4df;
+  --chrome: #f6f5f2;
+  --ink: #22211e;
+  --ink-2: #5b5852;
+  --ink-3: #8c887f;
+  --line: #d8d5ce;
+  --accent: #2c5a86;
+  --accent-soft: #e1eaf3;
+  --paper: #ffffff;
+  --paper-ink: #000000;
+  --cite: #2c5a86;
+  --ui: "Noto Sans TC", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --serif: "Tinos", "Times New Roman", "DFKai-SB", "BiauKai", "KaiTi", "Kaiti TC", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #1d1f22; --chrome: #26282c; --ink: #e9e7e2; --ink-2: #b4b0a8; --ink-3: #8a867e;
+    --line: #3a3d42; --accent: #8fb6dc; --accent-soft: #2b3846; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --desk: #1d1f22; --chrome: #26282c; --ink: #e9e7e2; --ink-2: #b4b0a8; --ink-3: #8a867e;
+  --line: #3a3d42; --accent: #8fb6dc; --accent-soft: #2b3846; color-scheme: dark;
+}
+@font-face {
+  font-family: "DFKai-SB";
+  src: url("DFKai-SB.ttf") format("truetype");
+  font-display: swap;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 14px;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--chrome);
+}
+
+/* 頂列 */
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: var(--chrome);
+  border-bottom: 1px solid var(--line);
+}
+.bar h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-wrap: balance;
+}
+.bar .stamp { margin-left: auto; color: var(--ink-3); font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.toc-btn {
+  display: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-2);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.wrap {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 24px;
+  padding-block: 24px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* 目錄 */
+.toc {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 64px);
+  align-self: start;
+  max-height: calc(100vh - 88px);
+  overflow: auto;
+  font-size: 13px;
+}
+.how {
+  background: var(--accent-soft);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 10px 12px;
+  line-height: 1.6;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+}
+.how b { color: var(--accent); }
+.toc .label { font-size: 11px; letter-spacing: .08em; color: var(--ink-3); margin: 14px 0 6px; }
+.toc a {
+  display: flex;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  color: var(--ink-2);
+  text-decoration: none;
+  line-height: 1.4;
+}
+.toc a:hover { background: var(--chrome); color: var(--ink); }
+.toc a.on { background: var(--chrome); color: var(--accent); font-weight: 500; }
+.toc a .n { flex: none; width: 3.4em; color: var(--ink-3); }
+.toc a:focus-visible, .toc-btn:focus-visible, .cmt-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 論文頁：北科模板樣式 */
+.pages { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.paper {
+  width: 100%;
+  max-width: 21cm;
+  margin: 0 auto;
+  background: var(--paper);
+  color: var(--paper-ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 10px 30px rgba(0,0,0,.08);
+  padding: clamp(28px, 7vw, 2.5cm) clamp(20px, 6vw, 2.5cm) clamp(32px, 7vw, 3cm);
+  font-family: var(--serif);
+  font-size: 12pt;
+  line-height: 2;
+  text-align: justify;
+  scroll-margin-top: 72px;
+  overflow-wrap: anywhere;
+}
+.paper p { margin: 0; text-indent: 2em; }
+.paper h1, .paper h2, .paper h3, .paper h4 { font-weight: bold; line-height: 1.5; text-indent: 0; text-wrap: balance; scroll-margin-top: 72px; }
+.paper h1 { font-size: 20pt; text-align: center; margin: 0 0 20pt; }
+.paper h2 { font-size: 20pt; margin: 18pt 0 10pt; }
+.paper h3 { font-size: 18pt; margin: 16pt 0 8pt; }
+.paper h4 { font-size: 14pt; margin: 14pt 0 6pt; }
+.paper .no { margin-right: 1em; }
+.paper.front p { line-height: 1.8; }
+.paper ul, .paper ol { margin: 0; padding-left: 2em; }
+.paper blockquote { margin: 0 2em; }
+.paper code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 10.5pt; }
+.paper pre { font-size: 10pt; line-height: 1.5; background: #f4f3f0; padding: 8pt 10pt; overflow-x: auto; text-align: left; }
+.paper figure { margin: 12pt 0; text-align: center; }
+.paper figure img { max-width: 100%; width: 80%; height: auto; }
+.paper figcaption, .paper .tcap { text-align: center; text-indent: 0; }
+.paper .tcap { margin-top: 12pt; }
+.tbl { overflow-x: auto; margin: 0 auto 12pt; }
+.paper table { border-collapse: collapse; margin: 0 auto; line-height: 1.5; border: 1px solid #000; font-variant-numeric: tabular-nums; }
+.paper th, .paper td { padding: 1pt 8pt; font-weight: normal; }
+.paper thead th { border-bottom: 1px solid #000; }
+.paper .cite { color: var(--cite); }
+.paper math[display="block"] { margin: 8pt 0; font-size: 110%; }
+.paper .empty { color: #888; text-indent: 0; font-family: var(--ui); font-size: 11pt; }
+.paper ::selection { background: #fbe39a; }
+
+/* 封面 */
+.cover { text-align: center; display: flex; flex-direction: column; gap: 18pt; padding-block: 2.5cm; }
+.cover .univ { font-size: 20pt; font-weight: bold; letter-spacing: .1em; }
+.cover .dept { font-size: 16pt; font-weight: bold; }
+.cover .t-zh { font-size: 20pt; font-weight: bold; line-height: 1.5; margin-top: 24pt; text-wrap: balance; }
+.cover .t-en { font-size: 15pt; font-weight: bold; line-height: 1.4; text-wrap: balance; }
+.cover .who { font-size: 14pt; line-height: 2; margin-top: 30pt; }
+
+/* 選取文字後的批注按鈕 */
+.cmt-btn {
+  position: absolute;
+  z-index: 8;
+  border: 0;
+  border-radius: 7px;
+  padding: 6px 12px;
+  background: var(--ink);
+  color: var(--desk);
+  font: 500 13px var(--ui);
+  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+  cursor: pointer;
+}
+.note { color: var(--ink-3); font-size: 12px; margin: 0; line-height: 1.6; }
+
+/* 批注標示 */
+mark.cm { background: #fbe7a1; color: inherit; border-bottom: 2px solid #e2b330; cursor: pointer; }
+mark.cm.on { background: #f6c94c; }
+
+.list-btn {
+  border: 1px solid var(--line);
+  background: var(--chrome);
+  color: var(--ink);
+  border-radius: 7px;
+  padding: 4px 12px;
+  font: 500 13px var(--ui);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.list-btn b { color: var(--accent); margin-left: 4px; font-variant-numeric: tabular-nums; }
+.list-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 批注輸入框 */
+.pop {
+  position: absolute;
+  z-index: 9;
+  width: min(340px, calc(100vw - 32px));
+  background: var(--chrome);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.quote {
+  font-size: 12px;
+  color: var(--ink-2);
+  border-left: 3px solid #e2b330;
+  padding-left: 8px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pop textarea, .drawer input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--desk);
+  color: var(--ink);
+  padding: 8px 10px;
+  font: 14px/1.6 var(--ui);
+  resize: vertical;
+}
+.pop textarea:focus, .drawer input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.row { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+.ghost, .primary {
+  border-radius: 7px; padding: 6px 14px; font: 500 13px var(--ui); cursor: pointer;
+}
+.ghost { border: 1px solid var(--line); background: transparent; color: var(--ink-2); }
+.primary { border: 0; background: var(--accent); color: var(--chrome); }
+.ghost:focus-visible, .primary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 批注清單（右側抽屜） */
+.drawer {
+  position: fixed;
+  z-index: 7;
+  top: calc(env(safe-area-inset-top, 0px) + 49px);
+  right: 0;
+  bottom: 0;
+  width: min(360px, 100vw);
+  background: var(--chrome);
+  border-left: 1px solid var(--line);
+  box-shadow: -8px 0 24px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+.drawer-head { padding: 14px 16px 10px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line); }
+.drawer-head label { font-size: 12px; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; }
+.drawer ol { list-style: none; margin: 0; padding: 12px 16px; overflow: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.drawer li {
+  background: var(--desk);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+}
+.drawer li.on { border-color: #e2b330; box-shadow: 0 0 0 2px rgba(226,179,48,.35); }
+.drawer li .where { font-size: 11px; color: var(--ink-3); display: flex; gap: 8px; }
+.drawer li .where button { margin-left: auto; border: 0; background: transparent; color: var(--ink-3); cursor: pointer; font: 11px var(--ui); padding: 0; }
+.drawer li .where button:hover { color: #b3261e; }
+.drawer li .txt { white-space: pre-wrap; line-height: 1.6; font-size: 13.5px; }
+.drawer .empty-list { color: var(--ink-3); font-size: 13px; line-height: 1.7; padding: 4px 0; }
+.drawer-foot { padding: 12px 16px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.drawer-foot .primary { width: 100%; padding: 9px; }
+.drawer-foot textarea { width: 100%; height: 90px; font: 11px/1.4 ui-monospace, Menlo, monospace; }
+@media (min-width: 1240px) { body.drawer-open .wrap { margin-right: 360px; } }
+
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); }
+  .toc { display: none; position: static; max-height: none; }
+  .toc.open { display: block; }
+  .toc-btn { display: inline-block; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<header class="bar">
+  <h1 id="docTitle"></h1>
+  <span class="stamp" id="stamp"></span>
+  <button class="list-btn" id="listBtn" aria-expanded="false" aria-controls="drawer">批注<b id="count">0</b></button>
+  <button class="toc-btn" id="tocBtn" aria-expanded="false" aria-controls="toc">目錄</button>
+</header>
+
+<div class="wrap">
+  <nav class="toc" id="toc" aria-label="章節">
+    <div class="how" id="how">選取一段文字，按<b>「批注」</b>寫下意見。寫完後打開右上角「批注」，按<b>「複製全部批注」</b>，貼到 LINE 或 Email 傳給作者。</div>
+    <div id="tocList"></div>
+  </nav>
+  <main class="pages" id="pages"></main>
+</div>
+
+<button class="cmt-btn" id="cmtBtn" type="button" hidden>批注</button>
+
+<form class="pop" id="pop" hidden>
+  <div class="quote" id="popQuote"></div>
+  <textarea id="popText" rows="4" maxlength="4000" placeholder="寫下意見…"></textarea>
+  <div class="row">
+    <button type="button" class="ghost" id="popCancel">取消</button>
+    <button type="submit" class="primary">儲存</button>
+  </div>
+</form>
+
+<aside class="drawer" id="drawer" hidden aria-label="批注">
+  <div class="drawer-head">
+    <label for="who">您的稱呼（會附在批注上）
+      <input id="who" type="text" maxlength="40" placeholder="例如：王老師">
+    </label>
+  </div>
+  <ol id="cmtList"></ol>
+  <div class="drawer-foot">
+    <button type="button" class="primary" id="copyAll">複製全部批注</button>
+    <p class="note" id="copyNote">批注只存在這台電腦的瀏覽器裡。寫完請複製，貼到 LINE 或 Email 傳給作者。</p>
+    <textarea id="copyBox" readonly hidden aria-label="批注內容"></textarea>
+  </div>
+</aside>
+
+<script type="application/json" id="thesis-data"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script>
+// Markdown → 論文樣式 HTML（編輯器預覽與教授審閱頁共用；需要 marked、katex）
+'use strict';
+
+(function () {
+  const ZH = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  const zhNum = (n) => (n <= 10 ? ZH[n] : n < 20 ? '十' + ZH[n - 10] : ZH[Math.floor(n / 10)] + '十' + (n % 10 ? ZH[n % 10] : ''));
+
+  // 與 md2tex 相同的屬性語法：{#fig:id width=60%}、{#tbl:id}、{#sec:id}
+  const ATTR = /\s*\{([^}]*#[\w:-]+[^}]*|[^}]*width=\d+%[^}]*)\}\s*$/;
+  const parseAttr = (s) => ({ id: (s.match(/#([\w:-]+)/) || [])[1], width: (s.match(/width=(\d+)%/) || [])[1] });
+  const REF = /@((?:fig|tbl|eq|sec):[\w-]+)/g;
+
+  marked.setOptions({ gfm: true, breaks: false });
+
+  // output: 'mathml' 不需要 KaTeX 的 CSS 與字型（審閱頁用）
+  let mathOutput = 'htmlAndMathml';
+  function renderMath(tex, display) {
+    try { return katex.renderToString(tex, { displayMode: display, throwOnError: false, output: mathOutput }); }
+    catch { return tex; }
+  }
+
+  /**
+   * 把一個 Markdown 檔排進 el。
+   * opts.no      章號（0 = 前置頁，不編號）
+   * opts.asset   圖片相對路徑 → 實際網址
+   * 回傳本章圖表標籤 {id: '4.1'}，交互參照另外用 resolveRefs 套用。
+   */
+  function renderInto(el, src, opts = {}) {
+    const no = opts.no || 0;
+    const asset = opts.asset || ((p) => p);
+    mathOutput = opts.mathml ? 'mathml' : 'htmlAndMathml';
+
+    // 先抽出數學式，避免被 Markdown 改寫
+    const math = [];
+    const stash = (tex, display) => `M${math.push({ tex, display }) - 1}`;
+    const prepped = src
+      .replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => stash(t, true))
+      .replace(/(^|[^\\$])\$([^\s$](?:[^$\n]*?[^\s$])?)\$/g, (_, p, t) => p + stash(t, false));
+
+    const tokens = marked.lexer(prepped);
+    const out = document.createDocumentFragment();
+    let line = 0;
+    for (const t of tokens) {
+      const startLine = line + (t.raw.match(/^\n*/)[0].length);
+      line += (t.raw.match(/\n/g) || []).length;
+      if (t.type === 'space') continue;
+      const arr = [t];
+      arr.links = tokens.links;
+      const tpl = document.createElement('template');
+      tpl.innerHTML = marked.parser(arr);
+      for (const c of tpl.content.children) c.dataset.line = startLine;
+      out.append(tpl.content);
+    }
+    el.replaceChildren(out);
+
+    // 數學式、引用
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const fixes = [];
+    while (walker.nextNode()) {
+      const n = walker.currentNode;
+      if (n.parentElement.closest('code')) continue; // 程式碼裡的範例保持原樣
+      if (/M\d+|\[@[^\]]+\]/.test(n.nodeValue)) fixes.push(n);
+    }
+    for (const n of fixes) {
+      const span = document.createElement('span');
+      span.innerHTML = n.nodeValue
+        .replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))
+        .replace(/M(\d+)/g, (_, i) => renderMath(math[i].tex, math[i].display))
+        .replace(/\[(@[^\]]+)\]/g, (_, keys) => `<span class="cite" title="${keys}">[${keys.split(/;\s*/).map((k) => k.replace(/^@/, '')).join(', ')}]</span>`);
+      n.replaceWith(...span.childNodes);
+    }
+    // 程式碼區塊裡的數學占位符還原
+    el.querySelectorAll('code').forEach((c) => {
+      if (c.textContent.includes('M')) c.textContent = c.textContent.replace(/M(\d+)/g, (_, i) => (math[i].display ? `$$${math[i].tex}$$` : `$${math[i].tex}$`));
+    });
+
+    // 章節編號
+    const cnt = [0, 0, 0, 0];
+    el.querySelectorAll('h1, h2, h3, h4').forEach((h) => {
+      const last = h.lastChild;
+      if (last && last.nodeType === 3 && ATTR.test(last.nodeValue)) last.nodeValue = last.nodeValue.replace(ATTR, '');
+      if (!no) return;
+      const lv = +h.tagName[1];
+      cnt[lv - 1]++;
+      for (let i = lv; i < 4; i++) cnt[i] = 0;
+      const s = document.createElement('span');
+      s.className = 'no';
+      s.textContent = lv === 1 ? `第${zhNum(no)}章` : [no, ...cnt.slice(1, lv)].join('.');
+      h.prepend(s);
+    });
+
+    const refs = {};
+
+    // 圖：段落中只有一張圖（可加屬性）→ figure + 圖 n.k
+    let fig = 0;
+    el.querySelectorAll('p').forEach((p) => {
+      const img = p.querySelector(':scope > img');
+      if (!img) return;
+      const rest = [...p.childNodes].filter((n) => n !== img);
+      const tail = rest.map((n) => n.textContent).join('');
+      if (rest.some((n) => n.nodeType !== 3) || (tail.trim() && !ATTR.test(tail))) return;
+      const a = parseAttr(tail);
+      const src0 = img.getAttribute('src') || '';
+      if (!/^(https?:|data:|\/)/.test(src0)) img.src = asset(src0);
+      if (a.width) img.style.width = a.width + '%';
+      const f = document.createElement('figure');
+      f.dataset.line = p.dataset.line;
+      const cap = document.createElement('figcaption');
+      fig++;
+      const label = `${no ? no + '.' : ''}${fig}`;
+      if (a.id) refs[a.id] = label;
+      cap.textContent = `圖 ${label}　${img.alt}`;
+      f.append(img, cap);
+      p.replaceWith(f);
+    });
+
+    // 表：表格前或後的「Table: 標題 {#tbl:id}」段落 → 表 n.k 標題（置於表上方）
+    let tab = 0;
+    el.querySelectorAll('table').forEach((t) => {
+      const cand = [t.previousElementSibling, t.nextElementSibling].find((x) => x && x.tagName === 'P' && /^Table:\s*/.test(x.textContent));
+      tab++;
+      const label = `${no ? no + '.' : ''}${tab}`;
+      let title = cand ? cand.textContent.replace(/^Table:\s*/, '') : '';
+      const m = title.match(ATTR);
+      if (m) { const a = parseAttr(m[1]); if (a.id) refs[a.id] = label; title = title.replace(ATTR, ''); }
+      const cap = document.createElement('p');
+      cap.className = 'tcap';
+      cap.dataset.line = (cand || t).dataset.line;
+      cap.textContent = `表 ${label}　${title}`;
+      if (cand) cand.remove();
+      t.before(cap);
+    });
+
+    if (!src.trim()) el.innerHTML = '<p class="empty">（空白）</p>';
+    return refs;
+  }
+
+  // 交互參照 @fig:id / @tbl:id → 編號；找不到顯示 ??
+  function resolveRefs(el, refs) {
+    const rw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (rw.nextNode()) {
+      const n = rw.currentNode;
+      if (!n.parentElement.closest('code') && /@(fig|tbl|eq|sec):[\w-]+/.test(n.nodeValue)) nodes.push(n);
+    }
+    for (const n of nodes) n.nodeValue = n.nodeValue.replace(REF, (_, id) => refs[id] || '??');
+  }
+
+  window.ThesisRender = { renderInto, resolveRefs, zhNum };
+})();
+
+</script>
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+
+// 兩種模式：內嵌資料（claude.ai artifact），或加密的 data.json＋連結 # 後的金鑰（GitHub Pages）
+(async function boot() {
+  const inline = document.getElementById('thesis-data').textContent.trim();
+  if (inline) return main(JSON.parse(inline), null);
+  const b64 = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(s.length / 4) * 4, '=')), (c) => c.charCodeAt(0));
+  const k = new URLSearchParams(location.hash.slice(1)).get('k');
+  if (!k) return locked('這份審閱稿需要作者給的分享連結才能開啟。請確認連結完整（# 後面那段也要一起複製）。');
+  try {
+    const enc = await (await fetch('data.json', { cache: 'no-store' })).json();
+    const key = await crypto.subtle.importKey('raw', b64(k), 'AES-GCM', false, ['decrypt']);
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(enc.iv) }, key, b64(enc.data));
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('thesis-review:' + k));
+    const token = [...new Uint8Array(digest)].map((x) => x.toString(16).padStart(2, '0')).join('');
+    main(JSON.parse(new TextDecoder().decode(plain)), token);
+  } catch (e) {
+    locked('分享連結不正確或已經失效，請向作者索取最新的連結。');
+  }
+})();
+
+function locked(msg) {
+  $('#docTitle').textContent = '論文審閱稿';
+  $('#listBtn').hidden = true;
+  $('#toc').hidden = true;
+  const p = document.createElement('section');
+  p.className = 'paper';
+  p.innerHTML = '<p class="empty"></p>';
+  p.querySelector('p').textContent = msg;
+  $('#pages').append(p);
+}
+
+function main(data, token) {
+  const pages = $('#pages');
+  const tocList = $('#tocList');
+
+  document.title = data.title;
+  $('#docTitle').textContent = data.cover.cTitle || data.title;
+  $('#stamp').textContent = `${data.updated} 版`;
+
+  // 每個區塊給穩定的 id（章節＋內容雜湊），改版後未改動的段落批注仍對得上
+  function hash(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(36);
+  }
+
+  function addToc(id, num, title, group) {
+    if (group) {
+      const l = document.createElement('div');
+      l.className = 'label';
+      l.textContent = group;
+      tocList.append(l);
+    }
+    const a = document.createElement('a');
+    a.href = '#' + id;
+    a.dataset.target = id;
+    a.innerHTML = '<span class="n"></span><span class="t"></span>';
+    a.querySelector('.n').textContent = num;
+    a.querySelector('.t').textContent = title;
+    if (!num) a.querySelector('.n').remove();
+    tocList.append(a);
+  }
+
+  // 封面
+  const c = data.cover;
+  const cover = document.createElement('section');
+  cover.className = 'paper';
+  cover.id = 'cover';
+  cover.innerHTML = '<div class="cover"><div class="univ"></div><div class="dept"></div><div class="t-zh"></div><div class="t-en"></div><div class="who"></div></div>';
+  cover.querySelector('.univ').textContent = c.univ || '國立臺北科技大學';
+  cover.querySelector('.dept').textContent = [c.dept, (c.degree || '碩士') + '學位論文'].filter(Boolean).join('　');
+  cover.querySelector('.t-zh').textContent = c.cTitle || '';
+  cover.querySelector('.t-en').textContent = c.eTitle || '';
+  cover.querySelector('.who').innerText = [c.author && `研究生：${c.author}`, c.advisor && `指導教授：${c.advisor}`, c.date].filter(Boolean).join('\n');
+  pages.append(cover);
+  addToc('cover', '', '封面', '前置頁面');
+
+  const allRefs = {};
+  data.sections.forEach((sec, i) => {
+    const el = document.createElement('section');
+    el.className = 'paper' + (sec.no ? '' : ' front');
+    el.id = sec.id;
+    el.dataset.src = sec.path;
+    pages.append(el);
+    Object.assign(allRefs, ThesisRender.renderInto(el, sec.md, { no: sec.no, mathml: true, asset: (p) => (data.images || {})[p] || p }));
+    const seen = {};
+    for (const b of el.children) {
+      const k = hash(b.textContent.slice(0, 80));
+      seen[k] = (seen[k] || 0) + 1;
+      b.id = `${sec.id}-${k}${seen[k] > 1 ? '-' + seen[k] : ''}`;
+    }
+    el.querySelectorAll('table').forEach((t) => {
+      const box = document.createElement('div');
+      box.className = 'tbl';
+      t.replaceWith(box);
+      box.append(t);
+    });
+    const h1 = el.querySelector('h1');
+    const title = h1 ? h1.textContent.replace(/^第.+?章/, '').trim() : sec.path;
+    addToc(sec.id, sec.no ? `第${ThesisRender.zhNum(sec.no)}章` : '', title,
+      sec.no === 1 ? '章節' : '');
+  });
+  pages.querySelectorAll('section.paper').forEach((el) => ThesisRender.resolveRefs(el, allRefs));
+
+  // 目錄高亮目前章節
+  const links = [...tocList.querySelectorAll('a')];
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      links.forEach((a) => a.classList.toggle('on', a.dataset.target === e.target.id));
+    }
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  pages.querySelectorAll('section.paper').forEach((s) => io.observe(s));
+
+  const tocBtn = $('#tocBtn');
+  tocBtn.addEventListener('click', () => {
+    const open = $('#toc').classList.toggle('open');
+    tocBtn.setAttribute('aria-expanded', open);
+  });
+  tocList.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    e.preventDefault(); // 不改網址的 #，分享連結的金鑰在那裡
+    document.getElementById(a.dataset.target)?.scrollIntoView({ block: 'start' });
+    if (matchMedia('(max-width: 900px)').matches) {
+      $('#toc').classList.remove('open');
+      tocBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+  if (location.hash && !location.hash.includes('k=')) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+
+  // ---------- 批注：存在讀者自己的瀏覽器，複製成文字傳給作者 ----------
+  // 不靠 claude.ai 的留言功能，公開連結、沒登入的人也能用
+  const KEY = 'thesis-review:' + data.title;
+  const btn = $('#cmtBtn');
+  const pop = $('#pop');
+  const drawer = $('#drawer');
+  const listBtn = $('#listBtn');
+  let notes = [];
+  let pending = null;
+  let active = null;
+
+  // 有 data.api（GitHub Pages 模式）：批注存在作者的 Google 試算表，所有持連結的人共用
+  // 沒有：只存在這台瀏覽器，靠「複製全部批注」傳給作者
+  const remote = Boolean(data.api && token);
+  const fromServer = (items) => items.map((x) => ({ ...x, created: Date.parse(x.created) || 0 }));
+  async function call(body) {
+    const r = await fetch(data.api, { method: 'POST', body: JSON.stringify({ ...body, token }) });
+    const j = await r.json();
+    if (j.error) throw new Error(j.error);
+    notes = fromServer(j.items);
+  }
+  async function load() {
+    try { $('#who').value = localStorage.getItem(KEY + ':who') || ''; } catch { /* 無痕視窗 */ }
+    if (!remote) {
+      try { notes = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { notes = []; }
+      return;
+    }
+    try {
+      const j = await (await fetch(`${data.api}?token=${token}`)).json();
+      if (j.error) throw new Error(j.error);
+      notes = fromServer(j.items);
+      $('#copyNote').textContent = '批注會自動存起來，作者那邊看得到。';
+    } catch {
+      $('#copyNote').textContent = '暫時讀不到批注，請稍後重新整理。';
+    }
+  }
+  function save() {
+    if (remote) return;
+    try { localStorage.setItem(KEY, JSON.stringify(notes)); } catch { /* 無痕視窗：只在這次開啟有效 */ }
+  }
+  async function addNote(n) {
+    if (!remote) { notes.push(n); save(); return n.id; }
+    const before = new Set(notes.map((x) => x.id));
+    await call({ action: 'add', note: { ...n, path: (data.sections.find((x) => x.id === n.section) || {}).path, author: $('#who').value.trim() || '審閱者' } });
+    return (notes.find((x) => !before.has(x.id)) || {}).id;
+  }
+  async function deleteNote(id) {
+    if (!remote) { notes = notes.filter((x) => x.id !== id); save(); return; }
+    await call({ action: 'delete', id });
+  }
+  $('#who').addEventListener('input', (e) => { try { localStorage.setItem(KEY + ':who', e.target.value); } catch { /* 略過 */ } });
+
+  // 每章的純文字（不含公式的 MathML 註解），批注以「引用文字＋第幾次出現」定位
+  function textIndex(root) {
+    const nodes = [];
+    let text = '';
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement.closest('annotation') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    while (w.nextNode()) { nodes.push({ node: w.currentNode, start: text.length }); text += w.currentNode.nodeValue; }
+    return { nodes, text };
+  }
+  function offsetOf(idx, node, off) {
+    const hit = idx.nodes.find((x) => x.node === node);
+    if (hit) return hit.start + off;
+    const el = node.childNodes[off] || node;
+    const after = idx.nodes.find((x) => (el.compareDocumentPosition(x.node) & Node.DOCUMENT_POSITION_FOLLOWING) || el.contains(x.node));
+    return after ? after.start : idx.text.length;
+  }
+  function nth(text, q, n) {
+    let i = -1;
+    for (let k = 0; k <= n; k++) { i = text.indexOf(q, i + 1); if (i < 0) return -1; }
+    return i;
+  }
+
+  function sectionLabel(sec) {
+    if (!sec) return '';
+    const s = data.sections.find((x) => x.id === sec.id);
+    const h1 = sec.querySelector('h1');
+    return s && s.no ? `第${ThesisRender.zhNum(s.no)}章` : (h1 ? h1.textContent : '');
+  }
+  function headingBefore(sec, node) {
+    let label = '';
+    sec.querySelectorAll('h2, h3, h4').forEach((h) => {
+      if (h.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING) label = [...h.childNodes].map((x) => x.textContent.trim()).join(' ');
+    });
+    return label;
+  }
+
+  function paint() {
+    pages.querySelectorAll('mark.cm').forEach((m) => m.replaceWith(...m.childNodes));
+    pages.normalize();
+    for (const n of notes) {
+      const sec = document.getElementById(n.section);
+      if (!sec) continue;
+      const idx = textIndex(sec);
+      let at = nth(idx.text, n.quote, n.occurrence || 0);
+      if (at < 0) at = idx.text.indexOf(n.quote);
+      if (at < 0) continue;
+      const end = at + n.quote.length;
+      for (const { node, start } of idx.nodes) {
+        const e = start + node.nodeValue.length;
+        if (e <= at || start >= end) continue;
+        const r = document.createRange();
+        r.setStart(node, Math.max(at, start) - start);
+        r.setEnd(node, Math.min(end, e) - start);
+        const m = document.createElement('mark');
+        m.className = 'cm' + (n.id === active ? ' on' : '');
+        m.dataset.id = n.id;
+        try { r.surroundContents(m); } catch { /* 跨元素時略過該段 */ }
+      }
+    }
+  }
+
+  function renderList() {
+    $('#count').textContent = notes.length;
+    const ol = $('#cmtList');
+    ol.replaceChildren();
+    if (!notes.length) {
+      const p = document.createElement('p');
+      p.className = 'empty-list';
+      p.textContent = '還沒有批注。在論文中選取一段文字，按「批注」開始。';
+      ol.append(p);
+      return;
+    }
+    const order = data.sections.map((x) => x.id);
+    [...notes].sort((a, b) => order.indexOf(a.section) - order.indexOf(b.section) || a.created - b.created).forEach((n) => {
+      const li = document.createElement('li');
+      li.dataset.id = n.id;
+      if (n.id === active) li.classList.add('on');
+      li.innerHTML = '<div class="where"><span class="loc"></span><button type="button">刪除</button></div><div class="quote"></div><div class="txt"></div>';
+      li.querySelector('.loc').textContent = [remote && n.author, n.chapter, n.heading].filter(Boolean).join('　');
+      li.querySelector('.quote').textContent = n.quote;
+      li.querySelector('.txt').textContent = n.text;
+      li.querySelector('button').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const b = e.currentTarget;
+        if (b.dataset.confirm) {
+          deleteNote(n.id).then(() => { paint(); renderList(); }, () => { b.textContent = '刪除失敗，稍後再試'; });
+        } else {
+          b.dataset.confirm = '1';
+          b.textContent = '再按一次刪除';
+          setTimeout(() => { if (b.isConnected) { delete b.dataset.confirm; b.textContent = '刪除'; } }, 2500);
+        }
+      });
+      li.addEventListener('click', () => focusNote(n.id, true));
+      ol.append(li);
+    });
+  }
+
+  function focusNote(id, scroll) {
+    active = id;
+    pages.querySelectorAll('mark.cm').forEach((m) => m.classList.toggle('on', m.dataset.id === id));
+    $('#cmtList').querySelectorAll('li').forEach((li) => li.classList.toggle('on', li.dataset.id === id));
+    if (scroll) pages.querySelector(`mark[data-id="${id}"]`)?.scrollIntoView({ block: 'center' });
+    else $('#cmtList').querySelector(`li[data-id="${id}"]`)?.scrollIntoView({ block: 'nearest' });
+  }
+
+  function openDrawer(on) {
+    drawer.hidden = !on;
+    document.body.classList.toggle('drawer-open', on);
+    listBtn.setAttribute('aria-expanded', on);
+  }
+  listBtn.addEventListener('click', () => openDrawer(drawer.hidden));
+  pages.addEventListener('click', (e) => {
+    const m = e.target.closest('mark.cm');
+    if (!m) return;
+    openDrawer(true);
+    focusNote(m.dataset.id, false);
+  });
+
+  // 選取文字 → 「批注」按鈕
+  function placeButton() {
+    const sel = getSelection();
+    if (!sel.rangeCount || sel.isCollapsed) { btn.hidden = true; return; }
+    const r = sel.getRangeAt(0);
+    const sec = (r.commonAncestorContainer.nodeType === 1 ? r.commonAncestorContainer : r.commonAncestorContainer.parentElement).closest('section.paper');
+    if (!sec || sec.id === 'cover') { btn.hidden = true; return; }
+    const idx = textIndex(sec);
+    const a = offsetOf(idx, r.startContainer, r.startOffset);
+    const b = offsetOf(idx, r.endContainer, r.endOffset);
+    const raw = idx.text.slice(a, b);
+    const quote = raw.trim();
+    if (!quote) { btn.hidden = true; return; }
+    const startAt = a + raw.indexOf(quote);
+    let occurrence = 0, i = -1;
+    while ((i = idx.text.indexOf(quote, i + 1)) >= 0 && i < startAt) occurrence++;
+    pending = { section: sec.id, quote: quote.slice(0, 600), occurrence, heading: headingBefore(sec, r.startContainer), chapter: sectionLabel(sec) };
+    const rect = r.getBoundingClientRect();
+    btn.style.left = Math.min(document.documentElement.clientWidth - 80, Math.max(8, rect.right + scrollX - 30)) + 'px';
+    btn.style.top = rect.bottom + scrollY + 8 + 'px';
+    btn.hidden = false;
+  }
+  document.addEventListener('mouseup', (e) => { if (!pop.contains(e.target) && !drawer.contains(e.target)) setTimeout(placeButton, 0); });
+  document.addEventListener('touchend', () => setTimeout(placeButton, 350));
+  document.addEventListener('keyup', (e) => { if (e.shiftKey) placeButton(); });
+  btn.addEventListener('mousedown', (e) => e.preventDefault());
+  btn.addEventListener('click', () => {
+    if (!pending) return;
+    btn.hidden = true;
+    $('#popQuote').textContent = pending.quote;
+    $('#popText').value = '';
+    const w = Math.min(340, document.documentElement.clientWidth - 32);
+    pop.style.left = Math.max(16, Math.min(document.documentElement.clientWidth - w - 16, parseFloat(btn.style.left) - w / 2)) + 'px';
+    pop.style.top = btn.style.top;
+    pop.hidden = false;
+    $('#popText').focus();
+  });
+  $('#popCancel').addEventListener('click', () => { pop.hidden = true; });
+  $('#popText').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) pop.requestSubmit();
+    if (e.key === 'Escape') pop.hidden = true;
+  });
+  pop.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = $('#popText').value.trim();
+    if (!text || !pending) return;
+    const saveBtn = pop.querySelector('.primary');
+    saveBtn.disabled = true;
+    saveBtn.textContent = '儲存中…';
+    try {
+      const n = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...pending, text, created: Date.now() };
+      const id = await addNote(n);
+      pop.hidden = true;
+      getSelection().removeAllRanges();
+      active = id;
+      paint();
+      renderList();
+      openDrawer(true);
+      focusNote(id, false);
+    } catch {
+      saveBtn.textContent = '儲存失敗，再按一次';
+      saveBtn.disabled = false;
+      return;
+    }
+    saveBtn.textContent = '儲存';
+    saveBtn.disabled = false;
+  });
+
+  // 複製：前面給人看，後面附資料給作者的編輯器匯入
+  function exportText() {
+    const who = $('#who').value.trim() || '審閱者';
+    const order = data.sections.map((x) => x.id);
+    const sorted = [...notes].sort((a, b) => order.indexOf(a.section) - order.indexOf(b.section) || a.created - b.created);
+    const lines = [`【${data.title}】${who} 的批注（${data.updated} 版，共 ${notes.length} 則）`, ''];
+    sorted.forEach((n, i) => {
+      lines.push(`${i + 1}. ${[n.chapter, n.heading].filter(Boolean).join(' ')}`);
+      lines.push(`   原文：「${n.quote.length > 60 ? n.quote.slice(0, 60) + '…' : n.quote}」`);
+      lines.push(`   意見：${n.text.replace(/\n/g, '\n         ')}`);
+      lines.push('');
+    });
+    const payload = sorted.map((n) => ({
+      thread_id: n.id, section: n.section, path: (data.sections.find((x) => x.id === n.section) || {}).path,
+      quote: n.quote, occurrence: n.occurrence, text: n.text, author: who, created: new Date(n.created).toISOString(),
+    }));
+    lines.push('===== 以下為匯入資料，請整段一起傳給作者 =====');
+    lines.push(JSON.stringify(payload));
+    return lines.join('\n');
+  }
+  $('#copyAll').addEventListener('click', async () => {
+    if (!notes.length) { $('#copyNote').textContent = '還沒有批注可以複製。'; return; }
+    const text = exportText();
+    const box = $('#copyBox');
+    try {
+      await navigator.clipboard.writeText(text);
+      box.hidden = true;
+      $('#copyNote').textContent = `已複製 ${notes.length} 則批注，貼到 LINE 或 Email 傳給作者即可。`;
+    } catch {
+      box.hidden = false;
+      box.value = text;
+      box.focus();
+      box.select();
+      $('#copyNote').textContent = '已選取下方全部文字，請按 ⌘C（Windows 按 Ctrl+C）複製，再貼給作者。';
+    }
+  });
+
+  if (remote) {
+    $('#copyAll').hidden = true;
+    $('#how').innerHTML = '選取一段文字，按<b>「批注」</b>寫下意見，按儲存就會自動送給作者，不用另外傳。';
+    // 其他人新增的批注：每分鐘更新一次（頁面在前景時）
+    setInterval(() => {
+      if (document.visibilityState !== 'visible' || !pop.hidden) return;
+      load().then(() => { paint(); renderList(); });
+    }, 60000);
+  }
+  load().then(() => { paint(); renderList(); });
+}
+</script>
+</body></html>
